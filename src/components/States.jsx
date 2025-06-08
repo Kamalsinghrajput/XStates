@@ -6,6 +6,8 @@ const States = () => {
   const [state, setState] = useState([]);
   const [selectedState, setSelectedState] = useState("");
   const [city, setCity] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -30,14 +32,18 @@ const States = () => {
         );
         const data = await response.json();
         setState(data);
+        setSelectedState("");
+        setCity([]);
+        setSelectedCity("");
       } catch (error) {
-        console.error("Error fetching countries:", error);
+        console.error("Error fetching states:", error);
       }
     };
     fetchStates();
   }, [selectedCountry]);
 
   useEffect(() => {
+    if (!selectedState) return;
     const fetchCities = async () => {
       try {
         const response = await fetch(
@@ -45,50 +51,64 @@ const States = () => {
         );
         const data = await response.json();
         setCity(data);
+        setSelectedCity("");
       } catch (error) {
-        console.error("Error fetching countries:", error);
+        console.error("Error fetching cities:", error);
       }
     };
     fetchCities();
   }, [selectedState]);
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>Select Location</h2>
-      <div style={{ textAlign: "center", marginRight:"10px" }}>
-        <select
-          name=""
-          id=""
-          onChange={(e) => setSelectedCountry(e.target.value)}
-        >
-          <option value="">Select Country</option>
-          {country.map((item, index) => (
-            <option value={item} key={index}>
-              {item}
-            </option>
-          ))}
-        </select>
-        <select
-          name=""
-          id=""
-          onChange={(e) => setSelectedState(e.target.value)}
-        >
-          <option value="">Select States</option>
-          {state.map((item, index) => (
-            <option value={item} key={index}>
-              {item}
-            </option>
-          ))}
-        </select>
-        <select name="" id="">
-          <option value=""> Select City</option>
-          {city.map((item, index) => (
-            <option value={item} key={index}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div style={{ textAlign: "center", marginTop: "40px" }}>
+      <h2>Select Location</h2>
+      <select
+        onChange={(e) => setSelectedCountry(e.target.value)}
+        value={selectedCountry}
+      >
+        <option value="">Select Country</option>
+        {country.map((item, index) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+
+      <select
+        onChange={(e) => setSelectedState(e.target.value)}
+        value={selectedState}
+        disabled={!selectedCountry}
+        style={{ marginLeft: "10px" }}
+      >
+        <option value="">Select State</option>
+        {state.map((item, index) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+
+      <select
+        onChange={(e) => setSelectedCity(e.target.value)}
+        value={selectedCity}
+        disabled={!selectedState}
+        style={{ marginLeft: "10px" }}
+      >
+        <option value="">Select City</option>
+        {city.map((item, index) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+
+      {selectedCountry && selectedState && selectedCity && (
+        <div style={{ marginTop: "20px" }}>
+          <strong>
+            You Selected {selectedCity}, {selectedState}, {selectedCountry}
+          </strong>
+        </div>
+      )}
     </div>
   );
 };
